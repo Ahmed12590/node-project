@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../backend/frontend')));
 
 // API route
-app.post('/api/audit', async (req, res) => {
+app.post('/audit', async (req, res) => {
   const { domain, api_key, email } = req.body;
 
   if (!domain || !api_key || !email) {
