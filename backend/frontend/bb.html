@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ad Audit Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: #F9F9F9;
+      border-radius: 10px;
+      /* box-shadow: 0 0 10px rgba(0,0,0,0.1); */
+      /* background: #34B8D1; */
+      background: linear-gradient(325deg, rgba(52, 184, 209, 1) 57%, rgba(39, 145, 199, 1) 93%);
+      background-repeat: no-repeat;
+      height: 100vh;
+      text-align: center;
+    }
+    h2 {
+      font-size: 45px;
+      color: #30A1DB;
+      background-color: #F9F9F9;
+      border-radius: 45px;
+      display: inline-block;
+      padding: 8px 12px;
+      line-height: 0.7;
+    }
+    h1 {
+      /* color: #333; */
+      color: #F9F9F9;
+      font-size: 70px;
+      line-height: 0;
+    }
+    .input-btn{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+    }
+    input {
+      padding: 20px;
+      width: 60%;
+      margin-right: 10px;
+      border-radius: 45px;
+      border: 0 ;
+      font-size: 30px;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #F9F9F9;
+      color: #2996C8;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 51px;
+      border-radius: 45px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+       border: 4px solid #F9F9F9;
+    }
+    button:hover{
+      border: 4px solid #30A1DB;
+    }
+    #results {
+      margin-top: 2rem;
+    }
+    #loading {
+      margin-top: 1rem;
+      color: orange;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+    }
+    a {
+      color: #007BFF;
+    }
+  </style>
+</head>
+<body>
+  <h2>Calculate your wasted</h2>
+  <h1>Ad Spend now</h1>
+  <div class="input-btn">
+    <input type="text" id="domain" placeholder="www.website.com" />
+    <button  onclick="runAudit()">Audit <img src="./img-audit.png"></button>
+  </div>
+  <div id="loading">Auditing... Please wait</div>
+  <div id="results"></div>
+  <script>
+    const API_KEY = 'hd-ed49c215fc1b55dc06-e';  // Replace if needed
+    const EMAIL = 'team.brandboosters85@gmail.com';  // Replace if needed
+    async function runAudit() {
+      const domain = document.getElementById('domain').value.trim();
+      const results = document.getElementById('results');
+      const loading = document.getElementById('loading');
+      results.innerHTML = '';
+      loading.style.display = 'block';
+      try {
+        const response = await fetch('http://localhost:3001/api/audit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            domain,
+            api_key: API_KEY,
+            email: EMAIL
+          })
+        });
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(':x: Invalid response from server: ' + errText);
+        }
+        const data = await response.json();
+        loading.style.display = 'none';
+        const { meta, google } = data;
+        const facebookUrl = meta?.page_url
+        ? `<a href="${meta.page_url}" target="_blank">${meta.page_url}</a>`
+        : 'N/A';
+        // const facebookUrl = meta?.page_url
+        //     ? `<a href="${meta.page_url}" target="_blank">${meta.page_url}</a>`
+        //     : meta?.page_id
+        //       ? `<a href="https://facebook.com/${meta.page_id}" target="_blank">https://facebook.com/${meta.page_id}</a>`
+        //       : 'N/A';
+        const wastedSpend = (meta?.number_of_ads || 0) * 80;
+        results.innerHTML = `
+          <h3>Meta Ads</h3>
+          <p>Facebook Page: ${facebookUrl}</p>
+          <p>Page ID: ${meta?.page_id || 'N/A'}</p>
+          <p>Meta Ad Count: ${meta?.number_of_ads || 0}</p>
+          <p><strong>Estimated Wasted Ad Spend: $${wastedSpend.toLocaleString()}</strong></p>
+          <h3>Google Ads</h3>
+          <p>Google Ads Count: ${google?.total_ad_count || 0}</p>
+        `;
+      } catch (err) {
+        loading.style.display = 'none';
+        results.innerHTML = `<p class="error">${err.message}</p>`;
+        console.error(err);
+      }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('loading').style.display = 'none';
+    });
+  </script>
+</body>
+</html>

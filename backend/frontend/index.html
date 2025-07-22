@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Spend Audit Tool</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0  auto;
+    padding: 0;
+    background: linear-gradient(325deg, rgba(52, 184, 209, 1) 57%, rgba(39, 145, 199, 1) 93%);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+    margin-top: 50px;
+    max-width: 1200px;
+
+  }
+
+  h2 {
+    font-size: 2rem;
+    background: #f9f9f9;
+    color: #2996C8;
+    border-radius: 30px;
+    padding: 5px 15px;
+    display: inline-block;
+  }
+
+  h1 {
+    font-size: 5.5rem;
+    margin: 0.3rem 0 2rem;
+  }
+
+  .input-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 40%;
+    margin-top: 40px;
+  }
+
+  input {
+    padding: 15px;
+    font-size: 1rem;
+    width: 100%;
+    /* max-width: 500px; */
+    border-radius: 12px;
+    border: none;
+  }
+
+  button {
+    background: #f9f9f9;
+    color: #2996C8;
+    border: 3px solid #f9f9f9;
+    font-size: 1.5rem;
+    padding: 10px 30px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  button img{
+    width: 30px;
+  }
+
+  button:hover {
+    border-color: #30A1DB;
+  }
+
+  #loading {
+    display: none;
+    margin-top: 1rem;
+    color: #ff0;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  .results {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .card {
+    background: #f9f9f9;
+    color: #333;
+    padding: 1rem;
+    border-radius: 15px;
+    min-width: 255px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: space-around;
+    width: 320px;
+  }
+
+  .card h3{
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  .card strong {
+    display: block;
+    font-size: 1.5rem;
+    margin-top: 0.5rem;
+    color: black;
+  }
+
+  .card img{
+    width: 50px;
+  }
+  .card strong a{
+    color: black;
+    font-size: 0.8rem;
+  }
+   .card strong a:hover{
+    color: #2996C8;
+  }
+</style>
+</head>
+
+<body>
+  <h2>Calculate your wasted</h2>
+  <h1>Ad spend now</h1>
+
+  <div class="input-btn">
+    <input type="text" id="domain" placeholder="www.website.com">
+    <button onclick="runAudit()">Audit <img src="./img-audit.png" alt=""></button>
+  </div>
+
+  <div id="loading">Auditing... Please wait</div>
+
+  <div class="results" id="results"></div>
+
+<script>
+const API_KEY = 'hd-ed49c215fc1b55dc06-e';
+const EMAIL = 'team.brandboosters85@gmail.com';
+
+async function runAudit() {
+  const domain = document.getElementById('domain').value.trim();
+  const results = document.getElementById('results');
+  const loading = document.getElementById('loading');
+  results.innerHTML = '';
+  loading.style.display = 'block';
+
+  try {
+    const response = await fetch('http://localhost:3001/api/audit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domain, api_key: API_KEY, email: EMAIL })
+    });
+
+    if (!response.ok) {
+      throw new Error('Invalid response from server');
+    }
+
+    const data = await response.json();
+    loading.style.display = 'none';
+
+    const { meta, google } = data;
+
+    const facebookPage = meta?.page_url || 'N/A';
+    const adCount = meta?.number_of_ads || 0;
+    const wastedSpend = adCount * 80;
+    const googleads = google?.total_ad_count || 0;
+
+    results.innerHTML = `
+      <div class="card">
+        <img src="./icon1.png">
+        <div>
+        <h3>Facebook Page</h3>
+        <strong><a href="${facebookPage}" target="_blank">${facebookPage}</a></strong>
+        </div>
+      </div>
+      <div class="card">
+        <img src="./icon2.png">
+         <div>
+        <h3>Meta Ad Count</h3>
+        <strong>${adCount}</strong>
+         </div>
+      </div>
+      <div class="card">
+        <img src="./icon3.png">
+         <div>
+        <h3>Estimated Wasted Ad Spend</h3>
+        <strong>$${wastedSpend.toLocaleString()}</strong>
+         </div>
+      </div>
+      <div class="card">
+        <img src="./icon2.png">
+         <div>
+        <h3>Google Ad Count</h3>
+        <strong>${googleads}</strong>
+         </div>
+      </div>
+    `;
+  } catch (err) {
+    loading.style.display = 'none';
+    results.innerHTML = `<div class="card" style="background:#fdd;color:#900;">Error: ${err.message}</div>`;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('loading').style.display = 'none';
+});
+</script>
+</body>
+</html>
