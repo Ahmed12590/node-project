@@ -3,6 +3,7 @@ const axios = require('axios');
 const cors = require('cors');
 const path = require('path');
 const serverless = require('serverless-http');
+require('dotenv').config(); 
 
 const app = express();
 
@@ -10,11 +11,14 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static frontend (adjust path for Vercel)
-app.use(express.static(path.join(__dirname, '../backend/frontend')));
+app.use(express.static(path.join(__dirname, '../public')));
 
-// API route
 app.post('/audit', async (req, res) => {
-  const { domain, api_key, email } = req.body;
+  const { domain } = req.body;
+
+  // read api_key and email from .env
+  const api_key = process.env.API_KEY;
+  const email = process.env.EMAIL;
 
   if (!domain || !api_key || !email) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -54,7 +58,7 @@ app.post('/audit', async (req, res) => {
 
 // Catch-all to serve index.html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../backend/frontend', 'index.html'));
+  res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
 
 module.exports = serverless(app);

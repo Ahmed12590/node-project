@@ -195,9 +195,6 @@
   <div class="results" id="results"></div>
 
 <script>
-const API_KEY = 'hd-053c7f81faa91e5533-a';
-const EMAIL = 'afaq_khan20@yahoo.com';
-
 async function runAudit() {
   const domain = document.getElementById('domain').value.trim();
   const results = document.getElementById('results');
@@ -206,10 +203,10 @@ async function runAudit() {
   loading.style.display = 'block';
 
   try {
-    const response = await fetch('http://localhost:3001/api/audit', {
+    const response = await fetch('/api/audit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ domain, api_key: API_KEY, email: EMAIL })
+      body: JSON.stringify({ domain })
     });
 
     if (!response.ok) {
@@ -266,5 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('loading').style.display = 'none';
 });
 </script>
+
 </body>
 </html>
