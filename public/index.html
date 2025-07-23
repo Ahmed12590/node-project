@@ -7,7 +7,7 @@
 <style>
   body {
     font-family: Arial, sans-serif;
-    margin: 0  auto;
+    margin: 0 auto;
     padding: 0;
     background: linear-gradient(325deg, rgba(52, 184, 209, 1) 57%, rgba(39, 145, 199, 1) 93%);
     color: #fff;
@@ -15,10 +15,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* justify-content: center; */
     margin-top: 50px;
     max-width: 1200px;
-
   }
 
   h2 {
@@ -48,7 +46,6 @@
     padding: 15px;
     font-size: 1rem;
     width: 100%;
-    /* max-width: 500px; */
     border-radius: 12px;
     border: none;
   }
@@ -66,7 +63,8 @@
     align-items: center;
     gap: 10px;
   }
-  button img{
+
+  button img {
     width: 30px;
   }
 
@@ -103,10 +101,11 @@
     width: 320px;
   }
 
-  .card h3{
+  .card h3 {
     font-size: 1.2rem;
     font-weight: bold;
   }
+
   .card strong {
     display: block;
     font-size: 1.5rem;
@@ -114,70 +113,70 @@
     color: black;
   }
 
-  .card img{
+  .card img {
     width: 50px;
   }
-  .card strong a{
+
+  .card strong a {
     color: black;
     font-size: 0.8rem;
   }
-   .card strong a:hover{
+
+  .card strong a:hover {
     color: #2996C8;
   }
 
-@media (max-width: 786px) {
-  body {
-    margin: 0;
-    padding: 10px;
-    max-width: 100%;
+  @media (max-width: 786px) {
+    body {
+      margin: 0;
+      padding: 10px;
+      max-width: 100%;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      padding: 3px 10px;
+    }
+
+    .input-btn {
+      width: 90%;
+      margin-top: 20px;
+    }
+
+    input {
+      font-size: 0.9rem;
+      padding: 10px;
+    }
+
+    button {
+      font-size: 1rem;
+      padding: 8px 20px;
+    }
+
+    .results {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card {
+      width: 90%;
+      min-width: auto;
+      margin: 0 auto;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+    }
+
+    .card strong {
+      font-size: 1.2rem;
+    }
   }
-
-  h1 {
-    font-size: 2.5rem;
-    text-align: center;
-  }
-
-  h2 {
-    font-size: 1.2rem;
-    padding: 3px 10px;
-  }
-
-  .input-btn {
-    width: 90%;
-    margin-top: 20px;
-  }
-
-  input {
-    font-size: 0.9rem;
-    padding: 10px;
-  }
-
-  button {
-    font-size: 1rem;
-    padding: 8px 20px;
-  }
-
-  .results {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .card {
-    width: 90%;
-    min-width: auto;
-    margin: 0 auto;
-  }
-
-  .card h3 {
-    font-size: 1rem;
-  }
-
-  .card strong {
-    font-size: 1.2rem;
-  }
-}
-
-
 </style>
 </head>
 
@@ -186,7 +185,7 @@
   <h1>Ad spend now</h1>
 
   <div class="input-btn">
-    <input type="text" id="domain" placeholder="www.website.com">
+    <input type="text" id="domain" placeholder="example.com">
     <button onclick="runAudit()">Audit <img src="./img-audit.png" alt=""></button>
   </div>
 
@@ -210,7 +209,8 @@ async function runAudit() {
     });
 
     if (!response.ok) {
-      throw new Error('Invalid response from server');
+      const text = await response.text();
+      throw new Error(`Invalid response from server: ${response.status} - ${text}`);
     }
 
     const data = await response.json();
@@ -218,7 +218,10 @@ async function runAudit() {
 
     const { meta, google } = data;
 
-    const facebookPage = meta?.page_url || 'N/A';
+    const facebookPageLink = meta?.page_url
+      ? `<a href="${meta.page_url}" target="_blank">${meta.page_url}</a>`
+      : 'N/A';
+
     const adCount = meta?.number_of_ads || 0;
     const wastedSpend = adCount * 80;
     const googleads = google?.total_ad_count || 0;
@@ -228,29 +231,29 @@ async function runAudit() {
         <img src="./icon1.png">
         <div>
         <h3>Facebook Page</h3>
-        <strong><a href="${facebookPage}" target="_blank">${facebookPage}</a></strong>
+        <strong>${facebookPageLink}</strong>
         </div>
       </div>
       <div class="card">
         <img src="./icon2.png">
-         <div>
+        <div>
         <h3>Meta Ad Count</h3>
         <strong>${adCount}</strong>
-         </div>
+        </div>
       </div>
       <div class="card">
         <img src="./icon3.png">
-         <div>
+        <div>
         <h3>Estimated Wasted Ad Spend</h3>
         <strong>$${wastedSpend.toLocaleString()}</strong>
-         </div>
+        </div>
       </div>
       <div class="card">
         <img src="./icon2.png">
-         <div>
+        <div>
         <h3>Google Ad Count</h3>
         <strong>${googleads}</strong>
-         </div>
+        </div>
       </div>
     `;
   } catch (err) {
