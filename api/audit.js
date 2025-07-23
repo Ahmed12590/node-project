@@ -1,20 +1,13 @@
 const express = require('express');
 const axios = require('axios');
-const cors = require('cors');
-const path = require('path');
 const serverless = require('serverless-http');
 require('dotenv').config();
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 
-// ✅ Serve static files
-app.use(express.static(path.join(__dirname, '../public')));
-
-// 📄 POST /api/audit
-app.post('/api/audit', async (req, res) => {
+app.post('/', async (req, res) => {
   const { domain } = req.body;
 
   const api_key = process.env.API_KEY;
@@ -28,13 +21,13 @@ app.post('/api/audit', async (req, res) => {
     const metaResponse = await axios.post('https://api.adyntel.com/facebook', {
       company_domain: domain,
       api_key,
-      email,
+      email
     });
 
     const googleResponse = await axios.post('https://api.adyntel.com/google', {
       company_domain: domain,
       api_key,
-      email,
+      email
     });
 
     const metaData = metaResponse.data || {};
@@ -44,21 +37,16 @@ app.post('/api/audit', async (req, res) => {
       meta: {
         page_id: metaData.page_id || null,
         page_url: metaData.results?.[0]?.[0]?.snapshot?.page_profile_uri || 'N/A',
-        number_of_ads: metaData.number_of_ads || 0,
+        number_of_ads: metaData.number_of_ads || 0
       },
       google: {
-        total_ad_count: googleData.total_ad_count || 0,
-      },
+        total_ad_count: googleData.total_ad_count || 0
+      }
     });
   } catch (error) {
     console.error('❌ API error:', error?.response?.data || error.message);
     res.status(500).json({ error: 'Failed to audit domain' });
   }
-});
-
-// ✅ Catch-all to serve index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
 
 module.exports = serverless(app);
