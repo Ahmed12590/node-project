@@ -29,7 +29,7 @@
   }
 
   h1 {
-    font-size: 5.5rem;
+    font-size: 4rem;
     margin: 0.3rem 0 2rem;
   }
 
@@ -54,18 +54,14 @@
     background: #f9f9f9;
     color: #2996C8;
     border: 3px solid #f9f9f9;
-    font-size: 1.5rem;
-    padding: 10px 30px;
+    font-size: 1.2rem;
+    padding: 8px 20px;
     border-radius: 30px;
     cursor: pointer;
     transition: 0.3s;
     display: flex;
     align-items: center;
     gap: 10px;
-  }
-
-  button img {
-    width: 30px;
   }
 
   button:hover {
@@ -96,87 +92,31 @@
     min-width: 255px;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    display: flex;
-    justify-content: space-around;
-    width: 320px;
+    width: 300px;
   }
 
   .card h3 {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: bold;
   }
 
   .card strong {
     display: block;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin-top: 0.5rem;
     color: black;
   }
 
-  .card img {
-    width: 50px;
-  }
-
-  .card strong a {
+  .card a {
     color: black;
-    font-size: 0.8rem;
+    text-decoration: underline;
+    word-break: break-all;
   }
 
-  .card strong a:hover {
+  .card a:hover {
     color: #2996C8;
   }
 
-  @media (max-width: 786px) {
-    body {
-      margin: 0;
-      padding: 10px;
-      max-width: 100%;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      text-align: center;
-    }
-
-    h2 {
-      font-size: 1.2rem;
-      padding: 3px 10px;
-    }
-
-    .input-btn {
-      width: 90%;
-      margin-top: 20px;
-    }
-
-    input {
-      font-size: 0.9rem;
-      padding: 10px;
-    }
-
-    button {
-      font-size: 1rem;
-      padding: 8px 20px;
-    }
-
-    .results {
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .card {
-      width: 90%;
-      min-width: auto;
-      margin: 0 auto;
-    }
-
-    .card h3 {
-      font-size: 1rem;
-    }
-
-    .card strong {
-      font-size: 1.2rem;
-    }
-  }
 </style>
 </head>
 
@@ -186,7 +126,7 @@
 
   <div class="input-btn">
     <input type="text" id="domain" placeholder="example.com">
-    <button onclick="runAudit()">Audit <img src="./img-audit.png" alt=""></button>
+    <button onclick="runAudit()">Audit</button>
   </div>
 
   <div id="loading">Auditing... Please wait</div>
@@ -218,7 +158,7 @@ async function runAudit() {
 
     const { meta, google } = data;
 
-    const facebookPageLink = meta?.page_url
+    const facebookPageLink = meta?.page_url !== 'N/A'
       ? `<a href="${meta.page_url}" target="_blank">${meta.page_url}</a>`
       : 'N/A';
 
@@ -228,32 +168,20 @@ async function runAudit() {
 
     results.innerHTML = `
       <div class="card">
-        <img src="./icon1.png">
-        <div>
         <h3>Facebook Page</h3>
         <strong>${facebookPageLink}</strong>
-        </div>
       </div>
       <div class="card">
-        <img src="./icon2.png">
-        <div>
         <h3>Meta Ad Count</h3>
         <strong>${adCount}</strong>
-        </div>
       </div>
       <div class="card">
-        <img src="./icon3.png">
-        <div>
         <h3>Estimated Wasted Ad Spend</h3>
         <strong>$${wastedSpend.toLocaleString()}</strong>
-        </div>
       </div>
       <div class="card">
-        <img src="./icon2.png">
-        <div>
         <h3>Google Ad Count</h3>
         <strong>${googleads}</strong>
-        </div>
       </div>
     `;
   } catch (err) {

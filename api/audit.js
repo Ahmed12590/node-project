@@ -7,7 +7,7 @@ const app = express();
 
 app.use(express.json());
 
-app.post('/', async (req, res) => {
+app.post('/api/audit', async (req, res) => {
   const { domain } = req.body;
 
   const api_key = process.env.API_KEY;
